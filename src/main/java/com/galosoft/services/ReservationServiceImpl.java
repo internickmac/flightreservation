@@ -10,6 +10,8 @@ import com.galosoft.entities.Reservation;
 import com.galosoft.repos.FlightRepository;
 import com.galosoft.repos.PassengerRepository;
 import com.galosoft.repos.ReservationRepository;
+import com.galosoft.util.EmailUtil;
+import com.galosoft.util.PDFGenerator;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -22,6 +24,12 @@ public class ReservationServiceImpl implements ReservationService {
 	
 	@Autowired
 	ReservationRepository reservationRepository;
+	
+	@Autowired
+	PDFGenerator pdfGenerator;
+	
+	@Autowired
+	EmailUtil emailUtil;
 	
 	@Override
 	public Reservation bookFlight(ReservationRequest request) {
@@ -41,8 +49,39 @@ public class ReservationServiceImpl implements ReservationService {
 		reservation.setCheckedIn(false);
 		
 		Reservation savedReservation = reservationRepository.save(reservation);
-				
+		
+		String filePath = "//home//bruno//Descargas//javaEE//SpringTasks//flightreservation//reservations" + savedReservation.getId()+".pdf";
+		
+		pdfGenerator.generateItinerary(savedReservation, filePath);
+		
+		emailUtil.sendItinerary(passenger.getEmail(), filePath);
 		return savedReservation;
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
